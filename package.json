@@ -14,7 +14,7 @@
     "src"
   ],
   "scripts": {
-    "build": "npm run build:lib && npm run build:dist && npm run build:dist-min",
+    "build": "npm run build:lib && npm run build:dist",
     "build:lib": "babel src --out-dir lib --copy-files",
     "build:dist": "webpack --progress --hide-modules",
     "build:dist-min": "NODE_ENV=production webpack --progress --hide-modules",

@@ -74,6 +74,11 @@ class Table {
     // Get row stream
     const rowStream = await createRowStream(source, this._encoding, this._parserOptions)
 
+    let rowNum0 = 0
+    rowStream.on('data', () => {
+      rowNum0 += 1
+    })
+
     // Get table row stream
     let rowNumber = 0
     const tableRowStream = rowStream.pipe(csv.transform(row => {
@@ -149,7 +154,7 @@ class Table {
         }
       }
 
-      // Form row
+      // Form rowrror0.messag
       if (keyed) {
         row = zipObject(this.headers, row)
       } else if (extended) {
@@ -160,8 +165,20 @@ class Table {
     }))
 
     // Handle csv errors
-    rowStream.on('error', () => {
-      const error = new TableSchemaError('Data source parsing error')
+    rowStream.on('error', (error0) => {
+      // Field exceeds max_limit_on_data_read setting (128000)
+      console.error('!!!error0:', error0.message)
+      console.log('!!!stack:', error0.stack)
+      const isQuoteError = error0.message.indexOf('Field exceeds max_limit_on_data_read setting') !== -1
+      let message
+      if (isQuoteError) {
+        message = `Data source parsing error: We suspect unclosed quote or double quote on line ${rowNum0 + 1}`
+      } else {
+        message = `Data source parsing error: ${error0.message}`
+      }
+
+      const error = new TableSchemaError(message)
+      // const error = new TableSchemaError('Data source parsing error');
       tableRowStream.emit('error', error)
     })
 
